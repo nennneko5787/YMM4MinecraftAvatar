@@ -1,0 +1,2 @@
+# YMM4MinecraftAvatar
+YMM4にマイクラのアバターを表示させる図形を追加するプラグイン。
