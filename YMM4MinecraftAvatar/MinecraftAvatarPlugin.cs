@@ -5,7 +5,7 @@ namespace YMM4MinecraftAvatar;
 
 public class MinecraftAvatarPlugin : IShapePlugin
 {
-    public string Name => "Minecraftアバター";
+    public string Name => "Minecraftアバタープラグイン";
     public bool IsExoShapeSupported => false;
     public bool IsExoMaskSupported => false;
 

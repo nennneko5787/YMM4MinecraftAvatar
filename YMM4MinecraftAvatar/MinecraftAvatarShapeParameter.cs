@@ -5,13 +5,14 @@ using YukkuriMovieMaker.Exo;
 using YukkuriMovieMaker.Player.Video;
 using YukkuriMovieMaker.Plugin.Shape;
 using YukkuriMovieMaker.Project;
+using YukkuriMovieMaker.UndoRedo;
 
 namespace YMM4MinecraftAvatar;
 
 internal class MinecraftAvatarShapeParameter : ShapeParameterBase
 {
     MinecraftEdition edition = MinecraftEdition.Java;
-    [Display(Name = "エディション", Description = "Java版(MCID) / 統合版(ゲーマータグ)")]
+    [Display(Name = "エディション", Description = "Java版 / 統合版")]
     [EnumComboBox]
     public MinecraftEdition Edition
     {
@@ -48,7 +49,17 @@ internal class MinecraftAvatarShapeParameter : ShapeParameterBase
     public override IShapeSource CreateShapeSource(IGraphicsDevicesAndContext devices)
         => new MinecraftAvatarShapeSource(devices, this);
 
-    internal void NotifySourceRefresh() => OnPropertyChanged(nameof(PlayerName));
+    static readonly UndoRedoEventArgs refreshEventArgs = new(new EmptyRefreshCommand());
+
+    internal void NotifySourceRefresh() => InvokeUndoRedoCommandCreatedEvent(refreshEventArgs);
+
+    sealed class EmptyRefreshCommand : IUndoRedoCommandBase
+    {
+        public bool IsAction => false;
+        public bool IsEmpty => true;
+        public bool CanConnect(IUndoRedoCommandBase command) => false;
+        public IUndoRedoCommandBase Connect(IUndoRedoCommandBase command) => this;
+    }
 
     protected override IEnumerable<IAnimatable> GetAnimatables() => [Size];
 
