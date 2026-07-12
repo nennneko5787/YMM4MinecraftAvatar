@@ -53,7 +53,7 @@ internal class MinecraftAvatarShapeSource : IShapeSource
 
         if (hasName)
         {
-            EnsureBitmap(key, parameter.Edition, name, parameter.IncludeHat);
+            EnsureBitmap(key, parameter.Edition, name, parameter.IncludeHat, desc.Usage);
         }
         else
         {
@@ -91,7 +91,7 @@ internal class MinecraftAvatarShapeSource : IShapeSource
         faceBitmap = null;
     }
 
-    void EnsureBitmap(string key, MinecraftEdition edition, string name, bool includeHat)
+    void EnsureBitmap(string key, MinecraftEdition edition, string name, bool includeHat, TimelineSourceUsage usage)
     {
         if (key == loadedKey)
             return;
@@ -116,7 +116,16 @@ internal class MinecraftAvatarShapeSource : IShapeSource
             }, TaskScheduler.Default);
         }
 
-        if (pendingDownload is null || !pendingDownload.IsCompleted)
+        if (pendingDownload is null)
+            return;
+
+        if (usage == TimelineSourceUsage.Exporting && !pendingDownload.IsCompleted)
+        {
+            try { pendingDownload.Wait(); }
+            catch { }
+        }
+
+        if (!pendingDownload.IsCompleted)
             return;
 
         var face = pendingDownload.GetAwaiter().GetResult();
